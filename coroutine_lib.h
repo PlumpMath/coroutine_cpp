@@ -14,6 +14,13 @@
 
 #define DEFAULT_STACK_SIZE 1024*1024*2;
 
+enum ThreadState {
+	FREE,
+	RUNNABLE,
+	RUNNING,
+	SUSPEND
+}
+
 /*
  * coroutine definition(user thread)
  */

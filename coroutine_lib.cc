@@ -18,18 +18,30 @@ void Func2(void *args) {
 }
 
 int UthreadCreate(Schedule &schedule, Fun func, void *args) {
+	Uthread uthread_;
+	getcontext(&uthread_.ctx);
+	uthread_.func = func;
+	uthread_.args = args;
+	schedule.threads.push_back(uthread_);
 }
 
 int UthreadYield(Schedule &schedule) {
 }
 
 void UtheadResume(Schedule &schedule, int id) {
+
 }
 
 int ScheduleFinished(const Schedule &schedule) {
 	return 0;
 }
 
+void TestSchedule(Schedule &schedule) {
+}
+
 int main(void) {
+	Schedule schedule;
+
+	ScheduleFinished(schedule);
 	return 0;
 }
