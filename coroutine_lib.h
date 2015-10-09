@@ -11,22 +11,23 @@
 #include <ucontext.h>
 #include <unistd.h>
 #include <vector>
+#include <cstdio>
 
-#define DEFAULT_STACK_SIZE 1024*1024*2;
+#define DEFAULT_STACK_SIZE (1024*512)
 
 enum ThreadState {
 	FREE,
 	RUNNABLE,
 	RUNNING,
 	SUSPEND
-}
+};
 
 /*
  * coroutine definition(user thread)
  */
-typedef void (Fun *)(void *args);
+typedef void (* Fun)(void *args);
 struct Uthread {
-	ucontext_t ctx; // using for save coroutine context
+	ucontext_t running_context; // using for save coroutine context
 	Fun func; // function pointer point to coroutine running function
 	void *args;
 	enum ThreadState state; // coroutine running state
@@ -47,7 +48,9 @@ struct Schedule {
 
 int UthreadCreate(Schedule &schedule, Fun func, void *args);
 int UthreadYield(Schedule &schedule);
-int UtheadResume(Schedule &schedule, int id);
+void UtheadResume(Schedule &schedule, int id);
 int ScheduleFinished(const Schedule &schedule);
+void UthreadFuncCalled(Schedule &schedule);
+void TestSchedule(Schedule &schedule); 
 
 #endif

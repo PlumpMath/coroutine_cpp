@@ -20,8 +20,6 @@ void Func1(void *args) {
 void Func2(void *args) {
 	for (int i = 0; i < 3; ++i) {
 		printf("******Func2 start\n");
-		// suspend current user thread
-		UthreadYield(*(Schedule *)(args));
 		sleep(1);
 	}
 }
@@ -29,6 +27,7 @@ void Func2(void *args) {
 void Func3(void *args) {
 	for (int i = 0; i < 3; ++i) {
 		printf("******Func3 start\n");
+		UthreadYield(*(Schedule *)(args));
 		sleep(1);
 	}
 }
@@ -60,7 +59,7 @@ int UthreadYield(Schedule &schedule) {
 		ucontext_t *cur_thread_context = &(schedule.threads[cur_thread].running_context);
 		ucontext_t *main_context = &(schedule.main);
 		schedule.threads[cur_thread].state = SUSPEND;
-		schedule.running_thread = -1;
+		//schedule.running_thread = -1;
 		swapcontext(cur_thread_context, main_context);
 	}
 
@@ -115,13 +114,13 @@ int ScheduleFinished(const Schedule &schedule) {
 		if (schedule.running_thread != -1) {
 			return 0;
 		} else {
-			for (std::size_t i = 0; i < schedule.threads.size(); ++i) {
-				if (schedule.threads[i].state != FREE) {
-					return 0;
-				}
+			for (int i = 0; i < schedule.threads.size(); ++i) {
 			}
 		}
 			
+			if (schedule.threads[schedule.running_thread].state == FREE)
+				return 0;
+
 		return 1;
 }
 
@@ -132,7 +131,7 @@ void TestSchedule(Schedule &schedule) {
 	UthreadCreate(schedule, Func2, &schedule);
 	UthreadCreate(schedule, Func3, &schedule);
 
-	while (!ScheduleFinished(schedule)) {
+	while (ScheduleFinished(schedule)) {
 		UtheadResume(schedule, 0);
 		UtheadResume(schedule, 1);
 		UtheadResume(schedule, 2);
